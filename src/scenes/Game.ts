@@ -56,27 +56,41 @@ class Game extends Phaser.Scene {
 
         })
 
-        this!.input!.keyboard!.on('keydown-SPACE', (pointer) => {
-            this.sword.display.setVisible(true);
-            this.tweens.add({
-                targets: this.sword,
-                ease: Phaser.Math.Easing,
-                angle: 110,
-                duration: 90,
-                onComplete: () => {
-                    this.sword.display.setVisible(false);
-                    this.sword.setAngle(0);
-                }
-            })
-        }, this);
+        // this!.input!.keyboard!.on('keydown-SPACE', (pointer) => {
+        //     this.sword.display.setVisible(true);
+        //     this.tweens.add({
+        //         targets: this.sword,
+        //         ease: Phaser.Math.Easing,
+        //         angle: 110,
+        //         duration: 90,
+        //         onComplete: () => {
+        //             this.sword.display.setVisible(false);
+        //             this.sword.setAngle(0);
+        //         }
+        //     })
+        // }, this);
 
-        this.physics.world.setBounds(0, 0, 1920, 600);
-        this.add.image(400, 300, 'sky').setScale(2)
+        this.physics.world.setBounds(0, 0, window.innerWidth + 300, window.innerHeight);
+        // this.add.image(400, 300, 'sky').setScale(2)
         this.platforms = this.physics.add.staticGroup();
-        this.platforms.create(400, 568, 'ground').setScale(2).refreshBody();
-        this.platforms.create(200, 268, 'ground').refreshBody();
+        this.platforms.create(400, 568, 'ground').setScale(2).refreshBody().setPipeline('Light2D');
+        this.platforms.create(200, 268, 'ground').refreshBody().setPipeline('Light2D');
+        this.platforms.create(0, 400, 'ground').setPipeline('Light2D');
+        let isLerp = true;
+        this.input.keyboard?.addListener('keydown-SPACE', (e: KeyboardEvent) => {
+            console.log(isLerp)
+            // this.platforms.create(this.boy.x + 200, 400, 'ground').setPipeline('Light2D');
+            if (isLerp) {
+                isLerp = false;
+                this.cameras.main.startFollow(this.boy).setLerp(0.008, 0.008);
+            } else {
+                isLerp = true;
+                this.cameras.main.stopFollow();
+            }
 
-        this.movingPlatform = this.physics.add.image(400, 400, 'ground');
+        })
+
+        this.movingPlatform = this.physics.add.image(400, 400, 'ground').setPipeline('Light2D');
         this.movingPlatform.setImmovable(true);
         this.movingPlatform.body.setAllowGravity(false);
         this.movingPlatform.setVelocityX(50);
@@ -90,6 +104,7 @@ class Game extends Phaser.Scene {
             frameRate: 10,
             repeat: -1
         });
+        this.player.setVisible(false)
 
         this.anims.create({
             key: 'turn',
@@ -104,8 +119,8 @@ class Game extends Phaser.Scene {
             repeat: -1
         });
 
-        this.physics.add.collider(this.player, this.platforms);
-        this.physics.add.collider(this.player, this.movingPlatform);
+        // this.physics.add.collider(this.player, this.platforms);
+        // this.physics.add.collider(this.player, this.movingPlatform);
 
         this.stars = this.physics.add.group({
             key: 'star',
@@ -116,8 +131,13 @@ class Game extends Phaser.Scene {
             (star as Phaser.Types.Physics.Arcade.ImageWithDynamicBody).setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
         }
         this.sword = new SwordContainer(this, this.player.x, this.player.y);
+        this.sword.setVisible(false)
 
         this.boy = this.add.spineContainer(400, 150, 'shadow', 'idle', true).setDepth(200);
+        this.lights.enable();
+        this.lights.setAmbientColor(0x808080);
+
+        this.light = this.lights.addLight(this.boy.x, this.boy.y, 280).setIntensity(3);
 
         // this.boy.spine.addListener('complete', (anim) => {
         //     // показываем последний кадр
@@ -133,8 +153,8 @@ class Game extends Phaser.Scene {
         this.physics.add.existing(this.boy);
 
 
-        this.physics.add.collider(this.player, this.platforms);
-        this.physics.add.collider(this.player, this.movingPlatform);
+        // this.physics.add.collider(this.player, this.platforms);
+        // this.physics.add.collider(this.player, this.movingPlatform);
         this.physics.add.collider(this.stars, this.platforms);
         this.physics.add.collider(this.stars, this.movingPlatform);
         this.physics.add.collider(this.sword.physicsDisplay, this.sword);
@@ -142,10 +162,13 @@ class Game extends Phaser.Scene {
         // this.physics.add.collider(this.spine.body, this.movingPlatform);
         this.physics.add.collider(this.boy, this.platforms);
         this.physics.add.collider(this.boy, this.movingPlatform);
+        this.physics.add.collider(this.stars, (this.boy.physicsBody));
 
 
 
-        this.physics.add.overlap(this.sword.physicsDisplay, this.stars, this.punchStar, undefined, this);
+        // this.physics.add.overlap(this.sword.physicsDisplay, this.stars, this.punchStar, undefined, this);
+        this.physics.add.overlap(this.boy.physicsBody, this.stars, this.punchStar, undefined, this);
+
         // this.sword = this.physics.add.sprite(this.player.x + 20, this.player.y, 'sword').setScale(0.01, 0.01).setDepth(2);
         // this.physics.add.existing(this.sword);
         // this.sword.body.setAllowGravity(false);
@@ -163,9 +186,16 @@ class Game extends Phaser.Scene {
         console.log('rightArm: ', rightArm.data);
 
         const boneSprite = this.boy.spine.findSlot('Kisty 2');
-        this.boy.spine.setColor(100, 'Kisty 2');
+        // this.boy.spine.setColor(100, 'Kisty 2');
 
 
+
+        this.cameras.main.startFollow(this.boy, false, 0.008, 0.008);
+        // this.cameras.main.startFollow(this.boy, true);
+        // this.cameras.main.ignore(this.boy)
+
+
+        console.log(this.cameras.main);
 
 
     }
@@ -190,15 +220,11 @@ class Game extends Phaser.Scene {
     update() {
         const size = this.animationNames.length
         const { left, right, up, space } = this.cursors;
-        const IK_ruka_l = this.boy.spine.skeleton.findIkConstraint('IK_ruka_l');
-        const leftArm = this.boy.spine.skeleton.findBone('bone11');
-        const boneSprite = this.boy.spine.findSlot('Kisty 2');
-        // this.boy.spine.skeleton.getRootBone().update()
-        // console.log('leftArm: ', leftArm);
+        this.boy.update(this.cameras.main);
 
+        this.light.x = this.boy.x;
+        this.light.y = this.boy.y - 15;
 
-        const hitboxCoords = { x: leftArm.worldX, y: leftArm.worldY * -1 + this.game.canvas.height - 10 };
-        this.boy.physicsBody.position.copy(hitboxCoords);
 
         if (left.isDown) {
             this.boy.body.setVelocityX(-300);
@@ -212,12 +238,12 @@ class Game extends Phaser.Scene {
             this.boy.spine.play('idle', true, true)
         }
         // controls up
-        if ((up.isDown || space.isDown) && this.boy.body.blocked.down) {
+        if ((up.isDown) && this.boy.body.blocked.down) {
             this.boy.spine.play('jump', false, true)
             this.boy.body.setVelocityY(-600);
         }
 
-        if (!this.boy.body.blocked.down) {
+        if ((left.isDown || right.isDown) && !this.boy.body.blocked.down || !this.boy.body.blocked.down) {
             // this.boy.spine.play('fly', false, true)
         }
         // this.sword.copyPosition({ x: this.player.x + 5, y: this.player.y + 10 });
