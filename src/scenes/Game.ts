@@ -36,24 +36,7 @@ class Game extends Phaser.Scene {
     }
 
     create() {
-        // this.shadow = this.add.spine(250, 400, 'shadow', 'walk', true).setDepth(300).setScale(0.5, 0.5)
-
-        // this.boy.spine.drawDebug = true;
-
-        // this.spine.drawDebug = true;
-
-        const startAnim = 'idle'
-        // this.spine = this.createSpineBoy(startAnim);
-        // this.physics.add.existing(this.spine);
-        // (this.spine.body as Phaser.Physics.Arcade.Body).setCollideWorldBounds(true);
-        // this.spine.body.setBounce(0.2);
-        // this.physics.add.existing(this.spine);
-
         this.input.keyboard?.on('keydown-UP', () => {
-            // this.boy.spine.play('jump', true, true)
-
-            // console.log('JUMP!!');
-
         })
 
         // this!.input!.keyboard!.on('keydown-SPACE', (pointer) => {
@@ -71,29 +54,20 @@ class Game extends Phaser.Scene {
         // }, this);
 
         this.physics.world.setBounds(0, 0, window.innerWidth + 300, window.innerHeight);
-        // this.add.image(400, 300, 'sky').setScale(2)
+        const sky = this.add.image(400, 300, 'sky').setScale(2);
+
+
+
         this.platforms = this.physics.add.staticGroup();
-        this.platforms.create(400, 568, 'ground').setScale(2).refreshBody().setPipeline('Light2D');
+        this.platforms.create(400, 568, 'ground').setScale(6).refreshBody().setPipeline('Light2D');
         this.platforms.create(200, 268, 'ground').refreshBody().setPipeline('Light2D');
         this.platforms.create(0, 400, 'ground').setPipeline('Light2D');
-        let isLerp = true;
-        this.input.keyboard?.addListener('keydown-SPACE', (e: KeyboardEvent) => {
-            console.log(isLerp)
-            // this.platforms.create(this.boy.x + 200, 400, 'ground').setPipeline('Light2D');
-            if (isLerp) {
-                isLerp = false;
-                this.cameras.main.startFollow(this.boy).setLerp(0.008, 0.008);
-            } else {
-                isLerp = true;
-                this.cameras.main.stopFollow();
-            }
 
-        })
 
-        this.movingPlatform = this.physics.add.image(400, 400, 'ground').setPipeline('Light2D');
-        this.movingPlatform.setImmovable(true);
-        this.movingPlatform.body.setAllowGravity(false);
-        this.movingPlatform.setVelocityX(50);
+        // this.movingPlatform = this.physics.add.image(400, 400, 'ground').setPipeline('Light2D');
+        // this.movingPlatform.setImmovable(true);
+        // this.movingPlatform.body.setAllowGravity(false);
+        // this.movingPlatform.setVelocityX(50);
 
         this.player = this.physics.add.sprite(100, 450, 'dude');
         this.player.setBounce(0.2);
@@ -125,15 +99,18 @@ class Game extends Phaser.Scene {
         this.stars = this.physics.add.group({
             key: 'star',
             repeat: 11,
-            setXY: { x: 12, y: 0, stepX: 70 }
+            setXY: { x: 12, y: 0, stepX: 70 },
         });
+        this.stars.setDepth(301);
         for (const star of this.stars.getChildren()) {
-            (star as Phaser.Types.Physics.Arcade.ImageWithDynamicBody).setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
+            (star as Phaser.Types.Physics.Arcade.ImageWithDynamicBody).setBounceY(Phaser.Math.FloatBetween(0.4, 0.9));
         }
         this.sword = new SwordContainer(this, this.player.x, this.player.y);
         this.sword.setVisible(false)
 
         this.boy = this.add.spineContainer(400, 150, 'shadow', 'idle', true).setDepth(200);
+        // console.log(this.boy);
+
         this.lights.enable();
         this.lights.setAmbientColor(0x808080);
 
@@ -148,7 +125,6 @@ class Game extends Phaser.Scene {
         const body = this.boy.body as Phaser.Physics.Arcade.Body;
         body.setCollideWorldBounds(true);
         this.boy.setPhysicsSize(body.width * 0.65, body.height * 0.9);
-        // this.boy.body.setBounce(0.09, 0.09);
         body.setDragX(1500);
         this.physics.add.existing(this.boy);
 
@@ -156,18 +132,23 @@ class Game extends Phaser.Scene {
         // this.physics.add.collider(this.player, this.platforms);
         // this.physics.add.collider(this.player, this.movingPlatform);
         this.physics.add.collider(this.stars, this.platforms);
-        this.physics.add.collider(this.stars, this.movingPlatform);
+        // this.physics.add.collider(this.stars, this.movingPlatform);
         this.physics.add.collider(this.sword.physicsDisplay, this.sword);
         // this.physics.add.collider(this.spine.body, this.platforms);
         // this.physics.add.collider(this.spine.body, this.movingPlatform);
         this.physics.add.collider(this.boy, this.platforms);
-        this.physics.add.collider(this.boy, this.movingPlatform);
-        this.physics.add.collider(this.stars, (this.boy.physicsBody));
+        // this.physics.add.collider(this.boy, this.stars);
+
+        // this.physics.add.collider(this.boy, this.movingPlatform);
+        this.physics.add.collider(this.boy.rightHitBox, this.stars, (obj1, obj2) => {
+            console.log(obj1)
+        });
 
 
 
         // this.physics.add.overlap(this.sword.physicsDisplay, this.stars, this.punchStar, undefined, this);
-        this.physics.add.overlap(this.boy.physicsBody, this.stars, this.punchStar, undefined, this);
+        this.physics.add.overlap(this.boy.rightHitBox, this.stars, this.punchStar, undefined, this);
+
 
         // this.sword = this.physics.add.sprite(this.player.x + 20, this.player.y, 'sword').setScale(0.01, 0.01).setDepth(2);
         // this.physics.add.existing(this.sword);
@@ -183,20 +164,9 @@ class Game extends Phaser.Scene {
         // this.boy.setMixByName("walk", "jump", 0.2);
 
         const rightArm = this.boy.spine.skeleton.findBone('bone11');
-        console.log('rightArm: ', rightArm.data);
-
         const boneSprite = this.boy.spine.findSlot('Kisty 2');
         // this.boy.spine.setColor(100, 'Kisty 2');
-
-
-
         this.cameras.main.startFollow(this.boy, false, 0.008, 0.008);
-        // this.cameras.main.startFollow(this.boy, true);
-        // this.cameras.main.ignore(this.boy)
-
-
-        console.log(this.cameras.main);
-
 
     }
     private initializeAnimationsState(spineGO: SpineGameObject) {
@@ -220,110 +190,19 @@ class Game extends Phaser.Scene {
     update() {
         const size = this.animationNames.length
         const { left, right, up, space } = this.cursors;
-        this.boy.update(this.cameras.main);
+        this.boy.update(this.cameras.main, this.cursors);
 
         this.light.x = this.boy.x;
         this.light.y = this.boy.y - 15;
-
-
-        if (left.isDown) {
-            this.boy.body.setVelocityX(-300);
-            this.boy.faceDirection(-1);
-            this.boy.spine.play('walk', true, true)
-        } else if (right.isDown) {
-            this.boy.body.setVelocityX(300);
-            this.boy.faceDirection(1);
-            this.boy.spine.play('walk', true, true)
-        } else if (this.boy.body.blocked.down) {
-            this.boy.spine.play('idle', true, true)
-        }
-        // controls up
-        if ((up.isDown) && this.boy.body.blocked.down) {
-            this.boy.spine.play('jump', false, true)
-            this.boy.body.setVelocityY(-600);
-        }
-
-        if ((left.isDown || right.isDown) && !this.boy.body.blocked.down || !this.boy.body.blocked.down) {
-            // this.boy.spine.play('fly', false, true)
-        }
-        // this.sword.copyPosition({ x: this.player.x + 5, y: this.player.y + 10 });
-        // this.boy.spine.play('idle', true, true);
-        // this.spine.setPosition(this.player.x, this.player.y + 250);
-        // if (Phaser.Input.Keyboard.JustDown(this.cursors.right)) {
-        //     if (this.animationIndex >= size - 1) {
-        //         this.animationIndex = 0
-        //     }
-        //     else {
-        //         ++this.animationIndex
-        //     }
-
-        //     this.changeAnimation(this.animationIndex)
-        // }
-        // this.spine.play('idle', true, true);
-
-        if (left.isDown && this.boy.body.touching.down) {
-            // this.player.setVelocityX(-160);
-            // this.player.anims.play('left', true);
-            // this.spine.play('run', true, true);
-            // this.spine.setScale(-0.3, 0.3);
-            // this.spine.x -= 4;
-            // this.spine.body.setVelocityX(-300);
-            // (this.boy.body as Phaser.Physics.Arcade.Body).setAccelerationX(100)
-            // this.boy.setScale(-0.3, 0.3);
-        }
-        else if (right.isDown && this.boy.body.touching.down) {
-            // this.player.setVelocityX(160);
-            // this.player.anims.play('right', true);
-            // this.spine.setScale(0.3, 0.3);
-            // this.spine.play('run', true, true);
-            // this.spine.x += 4;
-            // this.spine.body.setVelocityX(300);
-        }
-
-        else if (up.isDown && this.boy.body.touching.down) {
-        }
-        else {
-            // this.player.setVelocityX(0);
-            // this.player.anims.play('turn');
-            // this.spine.play('idle', true, true);
-            // this.spine.body.setVelocityX(0);
-            // this.boy.spine.play('idle', true, true);
-            // this.boy.body.setVelocity(0)
-        }
-        // if (this.cursors.up.isDown && this.spine.body.touching.down) // если нажата клавиша вверх и объект прикоснулся к земле
-        // {
-        //     this.spine.body.setVelocityY(-330); // Задаем вертикальную скорость объекту
-        //     // this.spine.play('jump', true, true);
-        // }
-
-        if (this.movingPlatform.x >= 500) {
-            this.movingPlatform.setVelocityX(-50);
-        }
-        else if (this.movingPlatform.x <= 300) {
-            this.movingPlatform.setVelocityX(50);
-        }
-
-        // if (this.spine.)
-        // if (up.isDown) {
-        //     this.boy.body.velocity.y = -200;
-
-        // } else {
-        //     this.boy.body.velocity.y = 0;
-        // }
-
-        // if (!this!.spine!.body!.touching.down) {
-        // this.player.setVelocityY(-330);
-        // this.spine.body.setVelocityY(-330)
-        // this.spine.play('jump', true, true);
-        // console.log(this!.spine!.body!.touching.down);
-
-        // }
     }
     collectStar(player, star?: Phaser.Types.Physics.Arcade.ImageWithDynamicBody) {
         // star!.disableBody(true, true);
     }
     punchStar(sword, star?: Phaser.Types.Physics.Arcade.ImageWithDynamicBody) {
-        star!.disableBody(true, true);
+        if (this.boy.spine.getData('attack')) {
+            star?.setVelocityX(1000);
+        }
+        // star!.disableBody(true, true);
     }
 }
 
@@ -335,7 +214,7 @@ const config: Phaser.Types.Core.GameConfig = {
     physics: {
         default: 'arcade',
         arcade: {
-            gravity: { y: 520 },
+            gravity: { y: 570 },
             debug: true
         }
     },

@@ -1,8 +1,8 @@
 {
     "skeleton": {
-        "hash": "BxAx8Ig3yn1jqayna8dGUeQu0jg",
+        "hash": "gei6WO2TDM5QJJpWHwa+EAnJ+Aw",
         "spine": "3.8.55",
-        "x": -286.96,
+        "x": -260.24,
         "y": 13.48,
         "width": 611.1,
         "height": 710.31,
@@ -18,7 +18,7 @@
             "parent": "root",
             "length": 90.25,
             "rotation": 80.33,
-            "x": -34.15,
+            "x": -7.43,
             "y": 310.17
         },
         {
@@ -151,7 +151,7 @@
         {
             "name": "IK_noga_l",
             "parent": "root",
-            "x": 58.97,
+            "x": 85.69,
             "y": 113.56,
             "transform": "noRotationOrReflection",
             "color": "ff3f00ff"
@@ -159,7 +159,7 @@
         {
             "name": "IK_noga_r",
             "parent": "root",
-            "x": -197.47,
+            "x": -170.76,
             "y": 128.69,
             "transform": "noRotationOrReflection",
             "color": "ff3f00ff"
@@ -1589,69 +1589,69 @@
                             0.58363
                         ],
                         "triangles": [
-                            3,
-                            10,
-                            0,
-                            1,
-                            3,
-                            0,
-                            3,
-                            1,
-                            2,
-                            10,
-                            3,
-                            4,
-                            17,
-                            22,
-                            0,
-                            10,
-                            17,
-                            0,
-                            9,
-                            10,
-                            4,
-                            9,
-                            4,
-                            5,
-                            21,
-                            22,
-                            17,
-                            17,
-                            10,
-                            11,
-                            16,
-                            17,
-                            11,
-                            18,
-                            21,
-                            17,
-                            8,
-                            9,
-                            5,
-                            15,
-                            16,
-                            11,
-                            19,
-                            20,
-                            21,
-                            18,
-                            19,
-                            21,
-                            8,
-                            5,
-                            6,
+                            13,
+                            14,
                             12,
+                            14,
                             15,
-                            11,
+                            12,
                             7,
                             8,
                             6,
-                            14,
-                            15,
                             12,
-                            13,
-                            14,
-                            12
+                            15,
+                            11,
+                            8,
+                            5,
+                            6,
+                            18,
+                            19,
+                            21,
+                            19,
+                            20,
+                            21,
+                            15,
+                            16,
+                            11,
+                            8,
+                            9,
+                            5,
+                            18,
+                            21,
+                            17,
+                            16,
+                            17,
+                            11,
+                            17,
+                            10,
+                            11,
+                            21,
+                            22,
+                            17,
+                            9,
+                            4,
+                            5,
+                            9,
+                            10,
+                            4,
+                            10,
+                            17,
+                            0,
+                            17,
+                            22,
+                            0,
+                            10,
+                            3,
+                            4,
+                            3,
+                            1,
+                            2,
+                            1,
+                            3,
+                            0,
+                            3,
+                            10,
+                            0
                         ],
                         "vertices": [
                             1,
@@ -4964,6 +4964,397 @@
         }
     ],
     "animations": {
+        "attack": {
+            "bones": {
+                "center": {
+                    "rotate": [
+                        {},
+                        {
+                            "time": 0.3667,
+                            "angle": 23.09
+                        }
+                    ],
+                    "translate": [
+                        {},
+                        {
+                            "time": 0.1333,
+                            "x": 1.12,
+                            "y": -110.88
+                        },
+                        {
+                            "time": 0.4333,
+                            "x": 0.34,
+                            "y": 28.7
+                        },
+                        {
+                            "time": 0.5667
+                        }
+                    ]
+                },
+                "bone2": {
+                    "rotate": [
+                        {},
+                        {
+                            "time": 0.1333,
+                            "angle": -22.32
+                        },
+                        {
+                            "time": 0.3333,
+                            "angle": 14.16
+                        },
+                        {
+                            "time": 0.5667,
+                            "angle": 22
+                        }
+                    ],
+                    "translate": [
+                        {}
+                    ]
+                },
+                "bone3": {
+                    "rotate": [
+                        {}
+                    ],
+                    "translate": [
+                        {}
+                    ]
+                },
+                "bone4": {
+                    "rotate": [
+                        {}
+                    ],
+                    "translate": [
+                        {}
+                    ]
+                },
+                "bone5": {
+                    "rotate": [
+                        {}
+                    ],
+                    "translate": [
+                        {}
+                    ]
+                },
+                "bone6": {
+                    "rotate": [
+                        {
+                            "angle": 1.14
+                        }
+                    ],
+                    "translate": [
+                        {}
+                    ]
+                },
+                "bone7": {
+                    "rotate": [
+                        {
+                            "angle": -4.92
+                        }
+                    ],
+                    "translate": [
+                        {}
+                    ]
+                },
+                "bone8": {
+                    "rotate": [
+                        {},
+                        {
+                            "time": 0.1667,
+                            "angle": -19.52
+                        },
+                        {
+                            "time": 0.4333,
+                            "angle": -4.05
+                        }
+                    ],
+                    "translate": [
+                        {}
+                    ]
+                },
+                "bone9": {
+                    "rotate": [
+                        {
+                            "angle": -12.15
+                        }
+                    ],
+                    "translate": [
+                        {}
+                    ]
+                },
+                "bone10": {
+                    "rotate": [
+                        {
+                            "angle": 22.61
+                        }
+                    ],
+                    "translate": [
+                        {}
+                    ]
+                },
+                "bone11": {
+                    "rotate": [
+                        {}
+                    ],
+                    "translate": [
+                        {}
+                    ]
+                },
+                "bone12": {
+                    "rotate": [
+                        {
+                            "angle": 25.09
+                        }
+                    ],
+                    "translate": [
+                        {}
+                    ]
+                },
+                "bone13": {
+                    "rotate": [
+                        {
+                            "angle": -48.58
+                        }
+                    ],
+                    "translate": [
+                        {}
+                    ]
+                },
+                "bone14": {
+                    "rotate": [
+                        {}
+                    ],
+                    "translate": [
+                        {}
+                    ]
+                },
+                "bone15": {
+                    "rotate": [
+                        {
+                            "angle": 22.83
+                        }
+                    ],
+                    "translate": [
+                        {}
+                    ]
+                },
+                "bone16": {
+                    "rotate": [
+                        {
+                            "angle": -33.24
+                        }
+                    ],
+                    "translate": [
+                        {}
+                    ]
+                },
+                "bone17": {
+                    "rotate": [
+                        {}
+                    ],
+                    "translate": [
+                        {}
+                    ]
+                },
+                "IK_noga_l": {
+                    "rotate": [
+                        {}
+                    ],
+                    "translate": [
+                        {}
+                    ]
+                },
+                "IK_noga_r": {
+                    "rotate": [
+                        {}
+                    ],
+                    "translate": [
+                        {}
+                    ]
+                },
+                "IK_ruka_l": {
+                    "rotate": [
+                        {}
+                    ],
+                    "translate": [
+                        {},
+                        {
+                            "time": 0.1667,
+                            "x": -79.48,
+                            "y": 178.55
+                        },
+                        {
+                            "time": 0.3333,
+                            "x": -64.34,
+                            "y": 159.6
+                        }
+                    ]
+                },
+                "IK_ruka_r": {
+                    "rotate": [
+                        {}
+                    ],
+                    "translate": [
+                        {},
+                        {
+                            "time": 0.1667,
+                            "x": 293.59,
+                            "y": 0.08
+                        },
+                        {
+                            "time": 0.2667,
+                            "x": -27.77,
+                            "y": -25.21
+                        },
+                        {
+                            "time": 0.3333,
+                            "x": -111.6,
+                            "y": -261.18
+                        },
+                        {
+                            "time": 0.3667,
+                            "x": -96.22,
+                            "y": -352.2
+                        },
+                        {
+                            "time": 0.4333,
+                            "x": -53.32,
+                            "y": -407.29
+                        },
+                        {
+                            "time": 0.4667,
+                            "x": 40.73,
+                            "y": -444.8
+                        },
+                        {
+                            "time": 0.5,
+                            "x": 258,
+                            "y": -461.03
+                        },
+                        {
+                            "time": 0.5667,
+                            "x": 309.21,
+                            "y": -445.36
+                        }
+                    ]
+                },
+                "bone18": {
+                    "rotate": [
+                        {},
+                        {
+                            "time": 0.5,
+                            "angle": -15.72
+                        }
+                    ],
+                    "translate": [
+                        {}
+                    ]
+                },
+                "bone19": {
+                    "rotate": [
+                        {}
+                    ],
+                    "translate": [
+                        {}
+                    ]
+                },
+                "bone20": {
+                    "rotate": [
+                        {}
+                    ],
+                    "translate": [
+                        {}
+                    ]
+                },
+                "bone21": {
+                    "rotate": [
+                        {}
+                    ],
+                    "translate": [
+                        {}
+                    ]
+                },
+                "bone22": {
+                    "rotate": [
+                        {}
+                    ],
+                    "translate": [
+                        {}
+                    ]
+                },
+                "bone23": {
+                    "rotate": [
+                        {}
+                    ],
+                    "translate": [
+                        {}
+                    ]
+                },
+                "bone24": {
+                    "rotate": [
+                        {}
+                    ],
+                    "translate": [
+                        {}
+                    ]
+                },
+                "bone25": {
+                    "rotate": [
+                        {}
+                    ],
+                    "translate": [
+                        {}
+                    ]
+                },
+                "bone26": {
+                    "rotate": [
+                        {}
+                    ],
+                    "translate": [
+                        {}
+                    ]
+                },
+                "bone27": {
+                    "rotate": [
+                        {}
+                    ],
+                    "translate": [
+                        {}
+                    ]
+                },
+                "bone28": {
+                    "rotate": [
+                        {}
+                    ],
+                    "translate": [
+                        {}
+                    ]
+                },
+                "bone29": {
+                    "rotate": [
+                        {}
+                    ],
+                    "translate": [
+                        {}
+                    ]
+                },
+                "bone30": {
+                    "rotate": [
+                        {}
+                    ],
+                    "translate": [
+                        {}
+                    ]
+                },
+                "bone31": {
+                    "rotate": [
+                        {}
+                    ],
+                    "translate": [
+                        {}
+                    ]
+                }
+            }
+        },
         "fly": {
             "bones": {
                 "root": {
