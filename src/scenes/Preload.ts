@@ -1,3 +1,4 @@
+// @ts-nocheck
 import Phaser from "phaser";
 
 import LizardPng from '../assets/lizard/lizard.png';

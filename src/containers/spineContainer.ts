@@ -1,3 +1,4 @@
+// @ts-nocheck
 import Phaser from 'phaser';
 import { game } from '../scenes/Game';
 

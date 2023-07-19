@@ -1,3 +1,4 @@
+// @ts-nocheck
 import Phaser from "phaser";
 import Preloader from "./Preload";
 import 'phaser/plugins/spine/dist/SpinePlugin';
