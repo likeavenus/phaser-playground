@@ -7,6 +7,9 @@ import { createLizardAnims } from "./assets/lizard/anims";
 import SwordContainer from "./SwordContainer";
 import SpineContainer from '../containers/spineContainer';
 import '../containers/spineContainer';
+import UIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
+import { TestGame } from './TestGame';
+import { getDialog } from './constants';
 
 class Game extends Phaser.Scene {
     cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
@@ -18,97 +21,117 @@ class Game extends Phaser.Scene {
     swordHitbox!: Phaser.Types.Physics.Arcade.ImageWithDynamicBody;
     spine!: SpineGameObject;
     boy!: SpineContainer;
-    private animNameLabel!: Phaser.GameObjects.Text
     private animationNames: string[] = []
-    private animationIndex = 0
+    level: number = 1;
+    loadNextLevel: boolean = false;
+    showDialog: boolean = false;
+    dialog: any;
+    dialogLevel: number = 0;
+    private backgrounds: {
+        ratioX: number;
+        sprite: Phaser.GameObjects.TileSprite
+    }[] = [];
+    private velocityX = 10;
 
     constructor() {
         super('Game');
     }
     preload() {
         this.cursors = this.input.keyboard!.createCursorKeys();
-    }
-    private createSpineBoy(startAnim = 'idle') {
-        const spineBoy = this.add.spine(400, 400, 'spineboy', startAnim, true).setDepth(200);
-        spineBoy.setScale(0.27, 0.27);
+        // this.load.scenePlugin('rexuiplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexuiplugin.min.js', 'rexUI', 'rexUI');
 
-        return spineBoy
     }
 
     create() {
-        this.input.keyboard?.on('keydown-UP', () => {
-        })
+        // this.cameras.main.setZoom(0.5, 0.5)
+        this.dialog = getDialog(this.scene.scene);
+        this.dialog
+            .on('button.click', (button, groupName, index, pointer, event) => {
+                if (button.name === 'X') {
+                    this.dialog.hide();
+                    this.showDialog = false;
+                }
+            }, this.scene)
+        var tween = this.tweens.add({
+            targets: this.dialog,
+            scaleX: 1,
+            scaleY: 1,
+            ease: 'Bounce', // 'Cubic', 'Elastic', 'Bounce', 'Back'
+            duration: 1000,
+            repeat: 0, // -1: infinity
+            yoyo: false
+        });
 
-        // this!.input!.keyboard!.on('keydown-SPACE', (pointer) => {
-        //     this.sword.display.setVisible(true);
-        //     this.tweens.add({
-        //         targets: this.sword,
-        //         ease: Phaser.Math.Easing,
-        //         angle: 110,
-        //         duration: 90,
-        //         onComplete: () => {
-        //             this.sword.display.setVisible(false);
-        //             this.sword.setAngle(0);
-        //         }
-        //     })
-        // }, this);
+        const { width, height } = this.scale;
+        this.level === 1 ?
+            this.add.image(0, 0, 'sky')
+                .setOrigin(0, 0)
+                .setScrollFactor(0)
+                .setScale(2, 2) : null;
 
-        this.physics.world.setBounds(0, 0, window.innerWidth + 300, window.innerHeight);
-        const sky = this.add.image(400, 300, 'sky').setScale(2);
+        this.backgrounds.push(
+            {
+                ratioX: 0.01,
+                sprite: this.add.tileSprite(0, 0, width, height, 'mountains')
+                    .setOrigin(0, 0)
+                    .setScrollFactor(0, 0)
+                    .setDepth(0).setScale(2, 2),
+            },
+            {
+                ratioX: 0.1,
+                sprite: this.add.tileSprite(0, 0, width, height, 'middle')
+                    .setOrigin(0, 0)
+                    .setScrollFactor(0, 0)
+                    .setDepth(0).setScale(2, 2)
+            },
+        )
+        const isFirstLevel = this.level === 1;
+        const map = this.make.tilemap({ key: isFirstLevel ? 'desert' : 'dungeon' });
+        const tileset = map.addTilesetImage('desert_tiles', 'tiles') as Phaser.Tilemaps.Tileset;
+        const groundLayer = map.createLayer(isFirstLevel ? 'ground' : 'Dungeon', tileset);
+        groundLayer?.setCollisionByProperty({ collides: true })
 
-
+        this.physics.world.setBounds(0, 0, 3600, 3600);
 
         this.platforms = this.physics.add.staticGroup();
-        this.platforms.create(400, 568, 'ground').setScale(6).refreshBody().setPipeline('Light2D');
-        this.platforms.create(200, 268, 'ground').refreshBody().setPipeline('Light2D');
-        this.platforms.create(0, 400, 'ground').setPipeline('Light2D');
+        this.platforms.create(200, 900, 'ground').refreshBody().setPipeline('Light2D');
+        // this.platforms.create(0, 920, 'ground').setPipeline('Light2D');
+        // this.platforms.create(400, 910, 'ground').setPipeline('Light2D');
 
+
+        // this.platforms.create(700, 890, 'ground').setPipeline('Light2D');
+        // this.platforms.create(1100, 960, 'ground').setPipeline('Light2D');
+        // this.platforms.create(1230, 960, 'ground').setPipeline('Light2D');
+
+        // this.platforms.create(1400, 920, 'ground').setPipeline('Light2D');
+        // this.platforms.create(1630, 960, 'ground').setPipeline('Light2D');
+
+        // this.platforms.create(1900, 1020, 'ground').setPipeline('Light2D');
+        // this.platforms.create(2100, 940, 'ground').setPipeline('Light2D');
+
+
+        this.platforms.create(2700, 1000, 'ground').setScale(2).refreshBody().setPipeline('Light2D').setData('');
 
         // this.movingPlatform = this.physics.add.image(400, 400, 'ground').setPipeline('Light2D');
         // this.movingPlatform.setImmovable(true);
         // this.movingPlatform.body.setAllowGravity(false);
         // this.movingPlatform.setVelocityX(50);
 
-        this.player = this.physics.add.sprite(100, 450, 'dude');
-        this.player.setBounce(0.2);
-        this.player.setCollideWorldBounds(true);
-        this.anims.create({
-            key: 'left',
-            frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 3 }),
-            frameRate: 10,
-            repeat: -1
-        });
-        this.player.setVisible(false)
-
-        this.anims.create({
-            key: 'turn',
-            frames: [{ key: 'dude', frame: 4 }],
-            frameRate: 20
-        });
-
-        this.anims.create({
-            key: 'right',
-            frames: this.anims.generateFrameNumbers('dude', { start: 5, end: 8 }),
-            frameRate: 10,
-            repeat: -1
-        });
-
-        // this.physics.add.collider(this.player, this.platforms);
-        // this.physics.add.collider(this.player, this.movingPlatform);
 
         this.stars = this.physics.add.group({
             key: 'star',
             repeat: 11,
             setXY: { x: 12, y: 0, stepX: 70 },
+            setScale: { x: 2, y: 2 }
         });
-        this.stars.setDepth(301);
+
         for (const star of this.stars.getChildren()) {
             (star as Phaser.Types.Physics.Arcade.ImageWithDynamicBody).setBounceY(Phaser.Math.FloatBetween(0.4, 0.9));
         }
-        this.sword = new SwordContainer(this, this.player.x, this.player.y);
-        this.sword.setVisible(false)
 
-        this.boy = this.add.spineContainer(400, 150, 'shadow', 'idle', true).setDepth(200);
+        this.boy = this.add.spineContainer(this.level === 1 ? 190 : 2317, this.level === 1 ? 600 : 240, 'shadow', 'idle', true)
+
+
         // console.log(this.boy);
 
         this.lights.enable();
@@ -129,44 +152,37 @@ class Game extends Phaser.Scene {
         this.physics.add.existing(this.boy);
 
 
-        // this.physics.add.collider(this.player, this.platforms);
-        // this.physics.add.collider(this.player, this.movingPlatform);
         this.physics.add.collider(this.stars, this.platforms);
-        // this.physics.add.collider(this.stars, this.movingPlatform);
-        this.physics.add.collider(this.sword.physicsDisplay, this.sword);
-        // this.physics.add.collider(this.spine.body, this.platforms);
-        // this.physics.add.collider(this.spine.body, this.movingPlatform);
-        this.physics.add.collider(this.boy, this.platforms);
-        // this.physics.add.collider(this.boy, this.stars);
+        this.physics.add.collider(this.boy, this.platforms, (obj1, obj2) => {
+            if (this.loadNextLevel) return;
 
-        // this.physics.add.collider(this.boy, this.movingPlatform);
-        this.physics.add.collider(this.boy.rightHitBox, this.stars, (obj1, obj2) => {
-            console.log(obj1)
+            if (obj2.data) {
+                this.cameras.main.stopFollow();
+                this.loadNextLevel = true;
+                this.cameras.main.fadeOut(600);
+
+                this.time.addEvent({
+                    delay: 2000,
+                    callback: () => {
+                        this.scene.restart({ level: this.level += 1 });
+                        this.loadNextLevel = false;
+                    }
+                })
+            }
         });
 
+        this.physics.add.collider(this.boy, groundLayer!);
+        this.physics.add.collider(this.stars, groundLayer!);
 
-
-        // this.physics.add.overlap(this.sword.physicsDisplay, this.stars, this.punchStar, undefined, this);
         this.physics.add.overlap(this.boy.rightHitBox, this.stars, this.punchStar, undefined, this);
-
-
-        // this.sword = this.physics.add.sprite(this.player.x + 20, this.player.y, 'sword').setScale(0.01, 0.01).setDepth(2);
-        // this.physics.add.existing(this.sword);
-        // this.sword.body.setAllowGravity(false);
-        // this.sword.setOrigin(0, 1);
-
-        // this.cameras.main.startFollow(this.spine, false, 0.04, 0.04, undefined, 200);
-        // this.physics.add.overlap(this.swordHitbox, this.stars, this.punchStar, undefined, this)
-
-        // this.initializeAnimationsState(this.spine);
-        // console.log(this.spine);
-        // console.log(this.boy.body);
-        // this.boy.setMixByName("walk", "jump", 0.2);
 
         const rightArm = this.boy.spine.skeleton.findBone('bone11');
         const boneSprite = this.boy.spine.findSlot('Kisty 2');
         // this.boy.spine.setColor(100, 'Kisty 2');
-        this.cameras.main.startFollow(this.boy, false, 0.008, 0.008);
+        this.cameras.main.startFollow(this.boy, false, 0.08, 0.09);
+        this.cameras.main.setFollowOffset(-300, 0);
+        /** исправляет дрожание персонажа при передвижении (jitter bug) */
+        this.physics.world.fixedStep = false;
 
     }
     private initializeAnimationsState(spineGO: SpineGameObject) {
@@ -194,6 +210,22 @@ class Game extends Phaser.Scene {
 
         this.light.x = this.boy.x;
         this.light.y = this.boy.y - 15;
+
+        if (!this.showDialog && this.boy.x + 600 >= 2700) {
+            this.showDialog = true;
+            console.log('run')
+            this.dialog.show();
+            this.dialog.popUp(1000);
+        } else if (this.showDialog && this.boy.x + 600 < 2700) {
+            this.showDialog = false;
+        }
+
+        this.dialog.x = this.boy.x + 200;
+        this.dialog.y = this.boy.y;
+
+        this.backgrounds.forEach((item) => {
+            item.sprite.tilePositionX = this.cameras.main.scrollX * item.ratioX;
+        })
     }
     collectStar(player, star?: Phaser.Types.Physics.Arcade.ImageWithDynamicBody) {
         // star!.disableBody(true, true);
@@ -207,21 +239,29 @@ class Game extends Phaser.Scene {
 }
 
 const config: Phaser.Types.Core.GameConfig = {
-    // type: Phaser.CANVAS,
     type: Phaser.WEBGL,
     width: window.innerWidth,
     height: window.innerHeight,
+    scale: {
+        mode: Phaser.Scale.FIT,
+        autoCenter: Phaser.Scale.CENTER_BOTH,
+    },
     physics: {
         default: 'arcade',
         arcade: {
-            gravity: { y: 570 },
-            debug: true
+            gravity: { y: 700 },
+            // debug: true
         }
     },
-    scene: [Preloader, Game],
+    scene: [Preloader, Game, TestGame],
     plugins: {
         scene: [
-            { key: 'SpinePlugin', plugin: window.SpinePlugin, mapping: 'spine', }
+            { key: 'SpinePlugin', plugin: window.SpinePlugin, mapping: 'spine', },
+            {
+                key: 'rexUI',
+                plugin: UIPlugin,
+                mapping: 'rexUI'
+            },
         ]
     }
 };

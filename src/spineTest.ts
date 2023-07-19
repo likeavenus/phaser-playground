@@ -1,3 +1,4 @@
+// @ts-nocheck
 import Phaser from 'phaser';
 import { game } from '../scenes/Game';
 
@@ -13,8 +14,6 @@ export default class SpineContainer extends Phaser.GameObjects.Container impleme
     private sgo!: SpineGameObject;
     private physicsObject!: Phaser.GameObjects.Arc;
     private rightArmHitBox!: Phaser.GameObjects.Arc;
-    private leftArmHitBox!: Phaser.GameObjects.Arc;
-
 
     get physicsBody() {
         return this.physicsObject.body as Phaser.Physics.Arcade.Body;
@@ -53,24 +52,18 @@ export default class SpineContainer extends Phaser.GameObjects.Container impleme
         this.sgo.setMix('attack', 'idle', 0.1);
         this.sgo.setMix('attack', 'walk', 0.1);
 
-        this.sgo.state.timeScale = 1.7;
-
-
-
+        console.log(123);
 
         // this.sgo.drawDebug = true;
         const leftArm = this.sgo.skeleton.findBone('bone11');
         const rightArm = this.sgo.skeleton.findBone('bone8');
-        // this.sgo.angleBoneToXY(rightArm, rightArm.worldX, rightArm.worldY)
 
         // this.sgo.setInteractive();
         this.rightArmHitBox = scene.add.circle(rightArm.worldX, this.scene.game.canvas.height - rightArm.worldY, 40, undefined, 0);
-        this.leftArmHitBox = scene.add.circle(rightArm.worldX, this.scene.game.canvas.height - rightArm.worldY, 40, undefined, 0);
         this.physicsObject = scene.add.circle(leftArm.worldX, this.scene.game.canvas.height - leftArm.worldY, 40, undefined, 0);
 
         this.rightArmHitBox.setData('bone', rightArm).setInteractive();
-        // this.scene.input.setDraggable(this.rightArmHitBox);
-
+        this.scene.input.setDraggable(this.rightArmHitBox);
 
         this.add(this.physicsObject);
         this.add(this.rightArmHitBox);
@@ -92,12 +85,6 @@ export default class SpineContainer extends Phaser.GameObjects.Container impleme
         const height = bounds.size.y;
         this.setPhysicsSize(width, height);
         this.add(this.sgo);
-
-        // scene.input.keyboard?.on('keydown-SPACE', () => {
-        //     this.sgo.play('attack', true, true)
-        // });
-
-        // leftArm.children.push(this.physicsBody)
         this.spine.setData('attack', false);
 
 
@@ -141,11 +128,14 @@ export default class SpineContainer extends Phaser.GameObjects.Container impleme
         };
         const rightHitboxCoords = {
             x: rightArm.worldX + camera.midPoint.x - this.scene.game.canvas.width / 2 - 10,
-            y: rightArm.worldY * -1 + this.scene.game.canvas.height + camera.midPoint.y - this.scene.game.canvas.height / 2
+            y: rightArm.worldY * -1 + this.scene.game.canvas.height + camera.midPoint.y - this.scene.game.canvas.height / 2 + 16
         };
         this.physicsBody.position.copy(leftHitboxCoords);
+        this.physicsBody.rotation = leftArm.data.rotation;
 
         this.rightHitBox.position.copy(rightHitboxCoords);
+        this.rightHitBox.rotation = rightArm.data.rotation;
+        // console.log(rightArm.worldY);
 
 
         if (left.isDown) {
@@ -153,6 +143,7 @@ export default class SpineContainer extends Phaser.GameObjects.Container impleme
             this.body.setVelocityX(-400);
             this.sgo.play('walk', true, true)
         } else if (right.isDown) {
+            console.log(this.x, this.y)
             this.faceDirection(1);
             this.body.setVelocityX(400);
             this.faceDirection(1);
@@ -160,7 +151,6 @@ export default class SpineContainer extends Phaser.GameObjects.Container impleme
         } else if (!isAttack && this.body.blocked.down) {
             this.sgo.play('idle', true, true)
         }
-        // controls up
         if ((up.isDown) && this.body.blocked.down) {
             this.spine.play('jump', false, true)
             this.body.setVelocityY(-600);
