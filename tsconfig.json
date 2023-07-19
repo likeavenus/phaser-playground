@@ -29,6 +29,7 @@
   "include": [
     "src",
     "@types",
+    "public/assets",
   ],
   "references": [
     {
