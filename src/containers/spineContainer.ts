@@ -1,6 +1,6 @@
 // @ts-nocheck
 import Phaser from "phaser";
-import { game } from "../scenes/Game";
+// import { game } from "../scenes/Game";
 
 declare global {
   interface ISpineContainer extends Phaser.GameObjects.Container {
@@ -18,6 +18,7 @@ export default class SpineContainer
   private physicsObject!: Phaser.GameObjects.Arc;
   private rightArmHitBox!: Phaser.GameObjects.Arc;
   private leftArmHitBox!: Phaser.GameObjects.Arc;
+  private canDoublejump!: boolean = false;
 
   get physicsBody() {
     return this.physicsObject.body as Phaser.Physics.Arcade.Body;
@@ -122,18 +123,34 @@ export default class SpineContainer
     this.spine.setData("attack", false);
 
     this.scene.input.keyboard?.on("keydown-SPACE", () => {
-      this.spine.setData("attack", true);
-      this.spine.play("attack", false, true);
-      // this.scene.cameras.main.zoomTo(0.1);
-      setTimeout(() => {
-        this.spine.play("idle", true, true);
-        this.spine.setData("attack", false);
-      }, 500);
+      if (this.body.blocked.down) {
+        this.spine.setData("attack", true);
+        this.spine.play("attack", false, true);
+        // this.scene.cameras.main.zoomTo(0.1);
+        setTimeout(() => {
+          this.spine.play("idle", true, true);
+          this.spine.setData("attack", false);
+        }, 500);
+      }
+    });
+    this.scene.input.keyboard?.on("keydown-UP", () => {
+      if (this.body.blocked.down) {
+        this.spine.play("jump", false, true);
+        this.body.setVelocityY(-600);
+        this.canDoublejump = true;
+      } else {
+        if (this.canDoublejump) {
+          this.spine.play("jump", false, true);
+          this.body.setVelocityY(-600);
+          this.canDoublejump = false;
+        }
+      }
     });
 
     // console.log(this.rightArmHitBox.getData('bone'));
     this.sgo.skeleton.updateWorldTransform();
   }
+
   faceDirection(dir: 1 | -1) {
     if (this.sgo.scaleX === dir) {
       return;
@@ -185,19 +202,29 @@ export default class SpineContainer
     if (left.isDown) {
       this.faceDirection(-1);
       this.body.setVelocityX(-400);
-      this.sgo.play("walk", true, true);
+      if (this.body.blocked.down) {
+        this.sgo.play("walk", true, true);
+      }
     } else if (right.isDown) {
       this.faceDirection(1);
       this.body.setVelocityX(400);
       this.faceDirection(1);
-      this.sgo.play("walk", true, true);
+      if (this.body.blocked.down) {
+        this.sgo.play("walk", true, true);
+      }
     } else if (!isAttack && this.body.blocked.down) {
       this.sgo.play("idle", true, true);
     }
     // controls up
     if (up.isDown && this.body.blocked.down) {
-      this.spine.play("jump", false, true);
-      this.body.setVelocityY(-600);
+      // this.spine.play("jump", false, true);
+      // this.body.setVelocityY(-600);
+    }
+    if (this.body.blocked.down) {
+    }
+    // TODO: сделать отдельную анимацию падения
+    if (!this.body.blocked.down) {
+      // this.spine.play("jump", false, true);
     }
   }
 }

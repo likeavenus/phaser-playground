@@ -44,25 +44,29 @@ export default class Lizard extends Phaser.Physics.Arcade.Sprite {
 
   protected preUpdate(t: number, dt: number): void {
     super.preUpdate(t, dt);
-    const speed = 100;
+    const speed = 85;
+    if (this.body?.blocked.down) {
+      switch (this.direction) {
+        //   case Direction.UP:
+        //     this.setVelocity(0, -speed);
+        //     break;
+        //   case Direction.DOWN:
+        //     this.setVelocity(0, speed);
+        //     break;
+        case Direction.LEFT:
+          this.setVelocityX(-speed);
+          this.scaleX = -3;
+          this.setOffset(16, 0);
+          this.anims.play("lizard-run", true);
+          break;
+        case Direction.RIGHT:
+          this.setVelocityX(speed);
+          this.scaleX = 3;
+          this.setOffset(0);
 
-    switch (this.direction) {
-      //   case Direction.UP:
-      //     this.setVelocity(0, -speed);
-      //     break;
-      //   case Direction.DOWN:
-      //     this.setVelocity(0, speed);
-      //     break;
-      case Direction.LEFT:
-        this.setVelocityX(-speed);
-        this.scaleX = -3;
-        this.anims.play("lizard-run", true);
-        break;
-      case Direction.RIGHT:
-        this.setVelocityX(speed);
-        this.scaleX = 3;
-        this.anims.play("lizard-run", true);
-        break;
+          this.anims.play("lizard-run", true);
+          break;
+      }
     }
   }
   create() {}

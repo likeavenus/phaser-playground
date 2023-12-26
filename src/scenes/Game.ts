@@ -50,6 +50,7 @@ class Game extends Phaser.Scene {
     this.dialog.on(
       "button.click",
       (button, groupName, index, pointer, event) => {
+        console.log(button.name);
         if (button.name === "X") {
           this.dialog.hide();
           this.showDialog = false;
@@ -57,6 +58,7 @@ class Game extends Phaser.Scene {
       },
       this.scene
     );
+
     var tween = this.tweens.add({
       targets: this.dialog,
       scaleX: 1,
@@ -116,12 +118,17 @@ class Game extends Phaser.Scene {
       "forest-tileset",
       "tiles"
     ) as Phaser.Tilemaps.Tileset;
+    const dungeonTileset = map.addTilesetImage(
+      "brick2",
+      "tiles2"
+    ) as Phaser.Tilemaps.Tileset;
+
     tileset.setTileSize(64, 64);
     // const bgLayer = map.createLayer("background", tileset);
     const groundLayer = map.createLayer("Tile Layer 1", tileset);
     const treesLayer = map.createLayer("trees", tileset);
     const trees2Layer = map.createLayer("trees2", tileset);
-    const dungeonLayer = map.createLayer("DungeonLayer", tileset);
+    const dungeonLayer = map.createLayer("DungeonLayer", dungeonTileset);
 
     // const groundLayer = map.createLayer("ground", tileset);
 
@@ -130,6 +137,7 @@ class Game extends Phaser.Scene {
 
     const debugLayer = this.add.graphics();
     groundLayer?.setCollisionByProperty({ collides: true });
+    dungeonLayer?.setCollisionByProperty({ collides: true });
     // groundLayer?.renderDebug(debugLayer, {
     //   tileColor: null,
     //   collidingTileColor: new Phaser.Display.Color(243, 234, 48, 255),
@@ -240,16 +248,32 @@ class Game extends Phaser.Scene {
     });
 
     lizards.get(256, 128, "lizard");
+    lizards.get(240, 200, "lizard");
 
-    this.physics.add.collider(this.boy, groundLayer!);
+    this.physics.add.collider(this.boy, groundLayer!, (obj1, obj2) => {
+      // console.log("obj1: ", obj1);
+    });
+    this.physics.add.collider(this.boy, dungeonLayer!, (obj1, obj2) => {});
+
     this.physics.add.collider(this.stars, groundLayer!);
+    this.physics.add.collider(this.stars, dungeonLayer!);
+
     this.physics.add.collider(lizards, groundLayer!);
     this.physics.add.collider(lizards, this.boy);
+    this.physics.add.collider(lizards, dungeonLayer);
 
     this.physics.add.overlap(
       this.boy.rightHitBox,
       this.stars,
       this.punchStar,
+      undefined,
+      this
+    );
+
+    this.physics.add.overlap(
+      this.boy.rightHitBox,
+      lizards,
+      this.punchLizard,
       undefined,
       this
     );
@@ -317,6 +341,21 @@ class Game extends Phaser.Scene {
     }
     // star!.disableBody(true, true);
   }
+
+  punchLizard(
+    sword,
+    lizards?: Phaser.Types.Physics.Arcade.ImageWithDynamicBody
+  ) {
+    if (this.boy.spine.getData("attack")) {
+      if (this.boy.sgo.scaleX > 0) {
+        lizards?.setVelocityX(300);
+      } else {
+        lizards?.setVelocityX(-300);
+      }
+      lizards?.setVelocityY(-400);
+    }
+    // star!.disableBody(true, true);
+  }
 }
 
 const config: Phaser.Types.Core.GameConfig = {
@@ -330,7 +369,7 @@ const config: Phaser.Types.Core.GameConfig = {
   physics: {
     default: "arcade",
     arcade: {
-      gravity: { y: 700 },
+      gravity: { y: 800 },
       // debug: true,
     },
   },
