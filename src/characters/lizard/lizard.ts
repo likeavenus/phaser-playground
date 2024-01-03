@@ -42,11 +42,6 @@ export default class Lizard extends Phaser.Physics.Arcade.Sprite {
       this.handleTileCollision,
       this
     );
-
-    //  Set-up an event handler
-    // this.emitter.on("dead", this.onDead, this);
-
-    //  Emit it a few times with varying arguments
   }
 
   public initEmitter(emitter: Phaser.Events.EventEmitter) {
@@ -108,7 +103,6 @@ export default class Lizard extends Phaser.Physics.Arcade.Sprite {
     if (go !== this) {
       return;
     }
-    console.log(go?.body?.blocked);
     if (go?.body?.blocked?.right || go?.body?.blocked?.left) {
       const newDirection = Phaser.Math.Between(2, 3);
       this.direction = newDirection;

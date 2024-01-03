@@ -267,13 +267,16 @@ class Game extends Phaser.Scene {
       runChildUpdate: true,
       createCallback: (go) => {
         (go as Lizard).initEmitter(this.emitter);
+        (go as Lizard).body.onCollide = true;
       },
     });
 
-    lizards.get(100, 2000, "lizard");
-    lizards.get(150, 200, "lizard");
-    lizards.get(150, 2500, "lizard");
-    lizards.get(300, 2500, "lizard");
+    // lizards.get(100, 2000, "lizard");
+    // lizards.get(150, 200, "lizard");
+    // lizards.get(150, 2500, "lizard");
+    // lizards.get(300, 2500, "lizard");
+    lizards.create(300, 2500, "lizard");
+    lizards.create(400, 2500, "lizard");
 
     this.physics.add.collider(this.boy, groundLayer!, (obj1, obj2) => {
       // console.log("obj1: ", obj1);
@@ -395,7 +398,7 @@ class Game extends Phaser.Scene {
     lizards?: Phaser.Types.Physics.Arcade.ImageWithDynamicBody
   ) {
     if (this.boy.spine.getData("attack")) {
-      lizards?.takeDamage(2);
+      lizards?.takeDamage(10);
       if (this.boy.sgo.scaleX > 0) {
         lizards?.setVelocityX(300);
       } else {

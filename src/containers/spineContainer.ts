@@ -219,7 +219,7 @@ export default class SpineContainer
         camera.midPoint.y -
         this.scene.game.canvas.height / 2,
     };
-    console.log(this.direction);
+
     if (this.direction > 0) {
       rightHitboxCoords.x += 60;
     } else {
