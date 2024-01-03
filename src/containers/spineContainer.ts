@@ -5,6 +5,7 @@ import Phaser from "phaser";
 declare global {
   interface ISpineContainer extends Phaser.GameObjects.Container {
     readonly spine: SpineGameObject;
+    direction: number;
     faceDirection(dir: 1 | -1): void;
     setPhysicsSize(width: number, height: number): void;
   }
@@ -19,6 +20,9 @@ export default class SpineContainer
   private rightArmHitBox!: Phaser.GameObjects.Arc;
   private leftArmHitBox!: Phaser.GameObjects.Arc;
   private canDoublejump!: boolean = false;
+  healthBar!: Phaser.GameObjects.Graphics;
+  public hp = 100;
+  direction: number = 1;
 
   get physicsBody() {
     return this.physicsObject.body as Phaser.Physics.Arcade.Body;
@@ -149,13 +153,33 @@ export default class SpineContainer
 
     // console.log(this.rightArmHitBox.getData('bone'));
     this.sgo.skeleton.updateWorldTransform();
+
+    this.healthBar = this.scene.add.graphics();
+    this.healthBar.setScrollFactor(0);
+  }
+
+  drawHealthBar() {
+    const width = 350;
+    const height = 15;
+    const x = -width / 2;
+    const healthPercentage = this.hp / 100;
+
+    this.healthBar.clear();
+
+    this.healthBar.fillStyle(0xff0000);
+    // const redWidth = width * healthPercentage;
+    this.healthBar.fillRect(50, 61, width, height);
+
+    this.healthBar.fillStyle(0x00ff00);
+    const greenWidth = width * healthPercentage;
+    this.healthBar.fillRect(50, 61, greenWidth, height);
   }
 
   faceDirection(dir: 1 | -1) {
     if (this.sgo.scaleX === dir) {
       return;
     }
-
+    this.direction = dir;
     this.sgo.scaleX = dir;
   }
 
@@ -195,8 +219,14 @@ export default class SpineContainer
         camera.midPoint.y -
         this.scene.game.canvas.height / 2,
     };
-    this.physicsBody.position.copy(leftHitboxCoords);
+    console.log(this.direction);
+    if (this.direction > 0) {
+      rightHitboxCoords.x += 60;
+    } else {
+      rightHitboxCoords.x -= 90;
+    }
 
+    this.physicsBody.position.copy(leftHitboxCoords);
     this.rightHitBox.position.copy(rightHitboxCoords);
 
     if (left.isDown) {
@@ -225,6 +255,13 @@ export default class SpineContainer
     // TODO: сделать отдельную анимацию падения
     if (!this.body.blocked.down) {
       // this.spine.play("jump", false, true);
+    }
+
+    if (this.hp > 0) {
+      this.drawHealthBar();
+    } else {
+      this.healthBar.clear();
+      // this.destroy(true);
     }
   }
 }

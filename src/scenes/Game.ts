@@ -284,7 +284,13 @@ class Game extends Phaser.Scene {
     this.physics.add.collider(this.stars, dungeonLayer!);
 
     this.physics.add.collider(lizards, groundLayer!);
-    this.physics.add.collider(lizards, this.boy);
+    this.physics.add.collider(
+      lizards,
+      this.boy,
+      this.attackBoy,
+      undefined,
+      this
+    );
     this.physics.add.collider(lizards, dungeonLayer);
 
     this.physics.add.overlap(
@@ -328,6 +334,19 @@ class Game extends Phaser.Scene {
     // this.animNameLabel.text = name
   }
 
+  private attackBoy(obj1, obj2) {
+    this.boy.hp -= 1;
+    const sgo = obj1 as SpineContainer;
+
+    if (obj2.x > obj1.x) {
+      sgo.body.setVelocityX(-1000);
+    } else {
+      sgo.body.setVelocityX(1000);
+    }
+
+    sgo.body.setVelocityY(-200);
+  }
+
   update() {
     this.starsText.setText(`Stars: ${this.starsSummary}`);
 
@@ -356,6 +375,7 @@ class Game extends Phaser.Scene {
   }
   collectStar(player, star?: Phaser.Types.Physics.Arcade.ImageWithDynamicBody) {
     star!.disableBody(true, true);
+    this.scene.remove(star);
     this.starsSummary += 5;
   }
   punchStar(sword, star?: Phaser.Types.Physics.Arcade.ImageWithDynamicBody) {
@@ -365,7 +385,7 @@ class Game extends Phaser.Scene {
       } else {
         star?.setVelocityX(-500);
       }
-      star?.setVelocityY(-500);
+      star?.setVelocityY(-50);
     }
     // star!.disableBody(true, true);
   }
@@ -375,7 +395,7 @@ class Game extends Phaser.Scene {
     lizards?: Phaser.Types.Physics.Arcade.ImageWithDynamicBody
   ) {
     if (this.boy.spine.getData("attack")) {
-      lizards?.takeDamage(100);
+      lizards?.takeDamage(2);
       if (this.boy.sgo.scaleX > 0) {
         lizards?.setVelocityX(300);
       } else {
