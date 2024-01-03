@@ -26,4 +26,16 @@ export const createLizardAnims = (
     repeat: -1,
     frameRate: 10,
   });
+
+  anims.create({
+    key: "lizard-hit",
+    frames: anims.generateFrameNames("lizard", {
+      start: 0,
+      end: 0,
+      prefix: "lizard_m_hit_anim_f",
+      suffix: ".png",
+    }),
+    repeat: -1,
+    frameRate: 10,
+  });
 };

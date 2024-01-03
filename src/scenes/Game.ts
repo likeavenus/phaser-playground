@@ -18,6 +18,7 @@ class Game extends Phaser.Scene {
   platforms!: Phaser.Physics.Arcade.StaticGroup;
   movingPlatform!: Phaser.Types.Physics.Arcade.ImageWithDynamicBody;
   stars!: Phaser.Physics.Arcade.Group;
+  starsSummary = 0;
   sword!: SwordContainer;
   swordHitbox!: Phaser.Types.Physics.Arcade.ImageWithDynamicBody;
   spine!: SpineGameObject;
@@ -28,6 +29,7 @@ class Game extends Phaser.Scene {
   showDialog: boolean = false;
   dialog: any;
   dialogLevel: number = 0;
+  emitter = new Phaser.Events.EventEmitter();
   private backgrounds: {
     ratioX: number;
     sprite: Phaser.GameObjects.TileSprite;
@@ -178,11 +180,16 @@ class Game extends Phaser.Scene {
 
     this.stars = this.physics.add.group({
       key: "star",
-      repeat: 11,
-      setXY: { x: 12, y: 0, stepX: 70 },
-      setScale: { x: 2, y: 2 },
+      repeat: 0,
+      setXY: { x: 12, y: Math.random() * 10, stepX: Math.random() * 20 },
+      setScale: { x: 0.8, y: 0.8 },
       dragX: 400,
       dragY: 100,
+      createCallback: (go) => {
+        const angle = Math.random() * 7 * Math.PI * 2;
+        go.setVelocityX(Math.sin(angle) * 500);
+        go.setVelocityY(Math.cos(angle) * 500);
+      },
     });
 
     for (const star of this.stars.getChildren()) {
@@ -199,7 +206,23 @@ class Game extends Phaser.Scene {
       true
     );
 
-    // console.log(this.boy);
+    this.starsText = this.add
+      .text(60, 30, `Stars: ${this.starsSummary}`, {
+        fontSize: "24px",
+        fontFamily: "Arial",
+        color: "#ffffff",
+      })
+      .setScrollFactor(0);
+
+    this.emitter.on("lizard-dead", ({ x, y }: { x: number; y: number }) => {
+      for (let i = 0; i < 15; i++) {
+        this.stars.create(x, y, "star");
+      }
+
+      this.starsText.setText(`Stars: ${this.starsSummary}`);
+
+      console.log(this.starsText);
+    });
 
     this.lights.enable();
     this.lights.setAmbientColor(0x808080);
@@ -241,14 +264,16 @@ class Game extends Phaser.Scene {
     // const lizard = this.physics.add.sprite(256, 500, "lizard").setScale(3.5);
     const lizards = this.physics.add.group({
       classType: Lizard,
+      runChildUpdate: true,
       createCallback: (go) => {
-        const lizardGameObject = go as Lizard;
-        lizardGameObject.body.onCollide = true;
+        (go as Lizard).initEmitter(this.emitter);
       },
     });
 
-    lizards.get(256, 128, "lizard");
-    lizards.get(240, 200, "lizard");
+    lizards.get(100, 2000, "lizard");
+    lizards.get(150, 200, "lizard");
+    lizards.get(150, 2500, "lizard");
+    lizards.get(300, 2500, "lizard");
 
     this.physics.add.collider(this.boy, groundLayer!, (obj1, obj2) => {
       // console.log("obj1: ", obj1);
@@ -263,9 +288,9 @@ class Game extends Phaser.Scene {
     this.physics.add.collider(lizards, dungeonLayer);
 
     this.physics.add.overlap(
-      this.boy.rightHitBox,
+      this.boy,
       this.stars,
-      this.punchStar,
+      this.collectStar,
       undefined,
       this
     );
@@ -283,7 +308,7 @@ class Game extends Phaser.Scene {
     // this.boy.spine.setColor(100, 'Kisty 2');
     this.cameras.main.startFollow(this.boy, false, 0.08, 0.09);
     // this.cameras.main.setFollowOffset(-300, 0);
-    this.cameras.main.setFollowOffset(-320, 80);
+    this.cameras.main.setFollowOffset(-20, 80);
     /** исправляет дрожание персонажа при передвижении (jitter bug) */
     this.physics.world.fixedStep = false;
   }
@@ -304,6 +329,8 @@ class Game extends Phaser.Scene {
   }
 
   update() {
+    this.starsText.setText(`Stars: ${this.starsSummary}`);
+
     const size = this.animationNames.length;
     const { left, right, up, space } = this.cursors;
     this.boy.update(this.cameras.main, this.cursors);
@@ -328,7 +355,8 @@ class Game extends Phaser.Scene {
     // });
   }
   collectStar(player, star?: Phaser.Types.Physics.Arcade.ImageWithDynamicBody) {
-    // star!.disableBody(true, true);
+    star!.disableBody(true, true);
+    this.starsSummary += 5;
   }
   punchStar(sword, star?: Phaser.Types.Physics.Arcade.ImageWithDynamicBody) {
     if (this.boy.spine.getData("attack")) {
@@ -347,12 +375,13 @@ class Game extends Phaser.Scene {
     lizards?: Phaser.Types.Physics.Arcade.ImageWithDynamicBody
   ) {
     if (this.boy.spine.getData("attack")) {
+      lizards?.takeDamage(100);
       if (this.boy.sgo.scaleX > 0) {
         lizards?.setVelocityX(300);
       } else {
         lizards?.setVelocityX(-300);
       }
-      lizards?.setVelocityY(-400);
+      lizards?.setVelocityY(-150);
     }
     // star!.disableBody(true, true);
   }
