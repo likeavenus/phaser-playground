@@ -136,6 +136,11 @@ export default class Lizard extends Phaser.Physics.Arcade.Sprite {
       }
     }
 
+    if (this.y > 3500) {
+      this.x = Math.random() * 2500;
+      this.y = Math.random() * 1000;
+    }
+
     if (this.hp > 0) {
       this.drawHealthBar();
     } else {

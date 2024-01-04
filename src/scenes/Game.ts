@@ -72,13 +72,13 @@ class Game extends Phaser.Scene {
     });
 
     const { width, height } = this.scale;
-    this.level === 1
-      ? this.add
-          .image(0, 0, "sky")
-          .setOrigin(0, 0)
-          .setScrollFactor(0)
-          .setScale(2, 2)
-      : null;
+    // this.level === 1
+    //   ? this.add
+    //       .image(0, 0, "sky")
+    //       .setOrigin(0, 0)
+    //       .setScrollFactor(0)
+    //       .setScale(2, 2)
+    //   : null;
 
     // this.backgrounds.push(
     //   {
@@ -102,7 +102,15 @@ class Game extends Phaser.Scene {
     // );
     const isFirstLevel = this.level === 1;
     // const map = this.make.tilemap({ key: isFirstLevel ? "desert" : "dungeon" });
-    const map = this.make.tilemap({ key: "map" });
+    // const map = this.make.tilemap({ key: "map" });
+    const map2 = this.make.tilemap({ key: "floorMap" });
+    const tileset2 = map2.addTilesetImage(
+      "floor",
+      "tiles-floor"
+    ) as Phaser.Tilemaps.Tileset;
+    tileset2.setTileSize(32, 32);
+    const groundLayer2 = map2.createLayer("Tile Layer 2", tileset2);
+    const groundLayer3 = map2.createLayer("Tile Layer 3", tileset2);
 
     // const map2 = this.make.tilemap({ key: "brick2" });
     // const tileset2 = map2.addTilesetImage(
@@ -116,21 +124,21 @@ class Game extends Phaser.Scene {
     //   "dungeon_plain",
     //   "tiles"
     // ) as Phaser.Tilemaps.Tileset;
-    const tileset = map.addTilesetImage(
-      "forest-tileset",
-      "tiles"
-    ) as Phaser.Tilemaps.Tileset;
-    const dungeonTileset = map.addTilesetImage(
-      "brick2",
-      "tiles2"
-    ) as Phaser.Tilemaps.Tileset;
+    // const tileset = map.addTilesetImage(
+    //   "forest-tileset",
+    //   "tiles"
+    // ) as Phaser.Tilemaps.Tileset;
+    // const dungeonTileset = map.addTilesetImage(
+    //   "brick2",
+    //   "tiles2"
+    // ) as Phaser.Tilemaps.Tileset;
 
-    tileset.setTileSize(64, 64);
-    // const bgLayer = map.createLayer("background", tileset);
-    const groundLayer = map.createLayer("Tile Layer 1", tileset);
-    const treesLayer = map.createLayer("trees", tileset);
-    const trees2Layer = map.createLayer("trees2", tileset);
-    const dungeonLayer = map.createLayer("DungeonLayer", dungeonTileset);
+    // tileset.setTileSize(64, 64);
+    // // const bgLayer = map.createLayer("background", tileset);
+    // const groundLayer = map.createLayer("Tile Layer 1", tileset);
+    // const treesLayer = map.createLayer("trees", tileset);
+    // const trees2Layer = map.createLayer("trees2", tileset);
+    // const dungeonLayer = map.createLayer("DungeonLayer", dungeonTileset);
 
     // const groundLayer = map.createLayer("ground", tileset);
 
@@ -138,8 +146,11 @@ class Game extends Phaser.Scene {
     // console.log("mossy: ", this.cache.tilemap.get("mossy").data);
 
     const debugLayer = this.add.graphics();
-    groundLayer?.setCollisionByProperty({ collides: true });
-    dungeonLayer?.setCollisionByProperty({ collides: true });
+    // groundLayer?.setCollisionByProperty({ collides: true });
+    groundLayer2?.setCollisionByProperty({ collides: true });
+    groundLayer3?.setCollisionByProperty({ collides: true });
+
+    // dungeonLayer?.setCollisionByProperty({ collides: true });
     // groundLayer?.renderDebug(debugLayer, {
     //   tileColor: null,
     //   collidingTileColor: new Phaser.Display.Color(243, 234, 48, 255),
@@ -206,6 +217,17 @@ class Game extends Phaser.Scene {
       true
     );
 
+    // this.tweens.add({
+    //   targets: this.boy,
+    //   // scaleX: 2,
+    //   // scaleY: 2,
+    //   alpha: 0,
+    //   ease: "Bounce", // 'Cubic', 'Elastic', 'Bounce', 'Back'
+    //   duration: 1000,
+    //   repeat: 0, // -1: infinity
+    //   yoyo: false,
+    // });
+
     this.starsText = this.add
       .text(60, 30, `Stars: ${this.starsSummary}`, {
         fontSize: "24px",
@@ -215,13 +237,11 @@ class Game extends Phaser.Scene {
       .setScrollFactor(0);
 
     this.emitter.on("lizard-dead", ({ x, y }: { x: number; y: number }) => {
-      for (let i = 0; i < 15; i++) {
+      for (let i = 0; i < 8; i++) {
         this.stars.create(x, y, "star");
       }
 
       this.starsText.setText(`Stars: ${this.starsSummary}`);
-
-      console.log(this.starsText);
     });
 
     this.lights.enable();
@@ -238,7 +258,7 @@ class Game extends Phaser.Scene {
     // });
     this.boy.setScale(0.27);
     const body = this.boy.body as Phaser.Physics.Arcade.Body;
-    body.setCollideWorldBounds(true);
+    // body.setCollideWorldBounds(true);
     this.boy.setPhysicsSize(body.width * 0.65, body.height * 0.9);
     body.setDragX(1500);
     this.physics.add.existing(this.boy);
@@ -277,24 +297,37 @@ class Game extends Phaser.Scene {
     // lizards.get(300, 2500, "lizard");
     lizards.create(300, 2500, "lizard");
     lizards.create(400, 2500, "lizard");
+    lizards.create(600, 2500, "lizard");
+    lizards.create(800, 2500, "lizard");
+    lizards.create(900, 2500, "lizard");
 
-    this.physics.add.collider(this.boy, groundLayer!, (obj1, obj2) => {
-      // console.log("obj1: ", obj1);
-    });
-    this.physics.add.collider(this.boy, dungeonLayer!, (obj1, obj2) => {});
+    this.physics.add.collider(this.boy, groundLayer2);
+    this.physics.add.collider(this.boy, groundLayer3);
 
-    this.physics.add.collider(this.stars, groundLayer!);
-    this.physics.add.collider(this.stars, dungeonLayer!);
+    this.physics.add.collider(lizards, groundLayer2);
+    this.physics.add.collider(lizards, groundLayer3);
 
-    this.physics.add.collider(lizards, groundLayer!);
-    this.physics.add.collider(
-      lizards,
-      this.boy,
-      this.attackBoy,
-      undefined,
-      this
-    );
-    this.physics.add.collider(lizards, dungeonLayer);
+    this.physics.add.collider(this.stars, groundLayer2);
+    this.physics.add.collider(this.stars, groundLayer3);
+
+    // this.physics.add.collider(this.boy, groundLayer!, (obj1, obj2) => {
+    //   // console.log("obj1: ", obj1);
+    // });
+    // this.physics.add.collider(this.boy, dungeonLayer!, (obj1, obj2) => {});
+    // this.physics.add.collider(this.boy, groundLayer2);
+
+    // this.physics.add.collider(this.stars, groundLayer!);
+    // this.physics.add.collider(this.stars, dungeonLayer!);
+
+    // this.physics.add.collider(lizards, groundLayer!);
+    // this.physics.add.collider(
+    // lizards,
+    // this.boy,
+    // this.attackBoy,
+    // undefined,
+    // this
+    // );
+    // this.physics.add.collider(lizards, dungeonLayer);
 
     this.physics.add.overlap(
       this.boy,
@@ -398,13 +431,13 @@ class Game extends Phaser.Scene {
     lizards?: Phaser.Types.Physics.Arcade.ImageWithDynamicBody
   ) {
     if (this.boy.spine.getData("attack")) {
-      lizards?.takeDamage(10);
+      lizards?.takeDamage(4);
       if (this.boy.sgo.scaleX > 0) {
-        lizards?.setVelocityX(300);
+        lizards?.setVelocityX(800);
       } else {
-        lizards?.setVelocityX(-300);
+        lizards?.setVelocityX(-800);
       }
-      lizards?.setVelocityY(-150);
+      lizards?.setVelocityY(-350);
     }
     // star!.disableBody(true, true);
   }

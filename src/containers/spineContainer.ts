@@ -130,12 +130,28 @@ export default class SpineContainer
       if (this.body.blocked.down) {
         this.spine.setData("attack", true);
         this.spine.play("attack", false, true);
-        // this.scene.cameras.main.zoomTo(0.1);
+        // this.scene.cameras.main.zoomTo(-0.01);
         setTimeout(() => {
           this.spine.play("idle", true, true);
           this.spine.setData("attack", false);
         }, 500);
       }
+    });
+
+    this.scene.input.keyboard?.on("keydown-Q", () => {
+      if (this.direction > 0) {
+        // this.body.setVelocityX(2000);
+        this.setPosition(this.x + 300, this.y);
+      } else {
+        // this.body.setVelocityX(-2000);
+        this.setPosition(this.x - 300, this.y);
+      }
+      this.scene.tweens.add({
+        targets: this,
+        alpha: 0,
+        duration: 120,
+        yoyo: true,
+      });
     });
     this.scene.input.keyboard?.on("keydown-UP", () => {
       if (this.body.blocked.down) {
@@ -228,6 +244,10 @@ export default class SpineContainer
 
     this.physicsBody.position.copy(leftHitboxCoords);
     this.rightHitBox.position.copy(rightHitboxCoords);
+
+    if (this?.body?.y > 3500) {
+      // this.body.y = -1000;
+    }
 
     if (left.isDown) {
       this.faceDirection(-1);
