@@ -119,6 +119,10 @@ export default class SpineContainer
     this.setPhysicsSize(width, height);
     this.add(this.sgo);
 
+    // this.body.checkCollision.up = false;
+    // this.body.checkCollision.left = false;
+    // this.body.checkCollision.right = false;
+
     // scene.input.keyboard?.on('keydown-SPACE', () => {
     //     this.sgo.play('attack', true, true)
     // });
@@ -130,7 +134,7 @@ export default class SpineContainer
       if (this.body.blocked.down) {
         this.spine.setData("attack", true);
         this.spine.play("attack", false, true);
-        // this.scene.cameras.main.zoomTo(-0.01);
+        // this.scene.cameras.main.zoomTo(0.5);
         setTimeout(() => {
           this.spine.play("idle", true, true);
           this.spine.setData("attack", false);
@@ -141,27 +145,33 @@ export default class SpineContainer
     this.scene.input.keyboard?.on("keydown-Q", () => {
       if (this.direction > 0) {
         // this.body.setVelocityX(2000);
-        this.setPosition(this.x + 300, this.y);
+        // this.setPosition(this.x + 300, this.y);
+        this.body.setVelocityX(4000);
       } else {
-        // this.body.setVelocityX(-2000);
-        this.setPosition(this.x - 300, this.y);
+        this.body.setVelocityX(-4000);
+        // this.setPosition(this.x - 300, this.y);
       }
+
       this.scene.tweens.add({
         targets: this,
         alpha: 0,
-        duration: 120,
+        duration: 80,
         yoyo: true,
       });
+
+      setTimeout(() => {
+        this.body.setVelocityX(0);
+      }, 80);
     });
     this.scene.input.keyboard?.on("keydown-UP", () => {
       if (this.body.blocked.down) {
         this.spine.play("jump", false, true);
-        this.body.setVelocityY(-600);
+        this.body.setVelocityY(-1000);
         this.canDoublejump = true;
       } else {
         if (this.canDoublejump) {
           this.spine.play("jump", false, true);
-          this.body.setVelocityY(-600);
+          this.body.setVelocityY(-1000);
           this.canDoublejump = false;
         }
       }
@@ -209,7 +219,7 @@ export default class SpineContainer
     camera: Phaser.Cameras.Scene2D.Camera,
     cursors: Phaser.Types.Input.Keyboard.CursorKeys
   ) {
-    const { left, right, up, space } = cursors;
+    const { left, right, up, space, q } = cursors;
     const leftArm = this.sgo.skeleton.findBone("bone11");
     const rightArm = this.sgo.skeleton.findBone("bone8");
     const isAttack = this.spine.getData("attack");
@@ -249,15 +259,21 @@ export default class SpineContainer
       // this.body.y = -1000;
     }
 
-    if (left.isDown) {
+    if (
+      left.isDown &&
+      !this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q).isDown
+    ) {
       this.faceDirection(-1);
-      this.body.setVelocityX(-400);
+      this.body.setVelocityX(-550);
       if (this.body.blocked.down) {
         this.sgo.play("walk", true, true);
       }
-    } else if (right.isDown) {
+    } else if (
+      right.isDown &&
+      !this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q).isDown
+    ) {
       this.faceDirection(1);
-      this.body.setVelocityX(400);
+      this.body.setVelocityX(550);
       this.faceDirection(1);
       if (this.body.blocked.down) {
         this.sgo.play("walk", true, true);

@@ -47,6 +47,14 @@ class Game extends Phaser.Scene {
   create() {
     createLizardAnims(this.anims);
 
+    this.boy = this.add.spineContainer(
+      this.level === 1 ? 190 : 2317,
+      this.level === 1 ? 3050 : 240,
+      "shadow",
+      "idle",
+      true
+    );
+
     // this.cameras.main.setZoom(0.5, 0.5)
     this.dialog = getDialog(this.scene.scene);
     this.dialog.on(
@@ -111,6 +119,21 @@ class Game extends Phaser.Scene {
     tileset2.setTileSize(32, 32);
     const groundLayer2 = map2.createLayer("Tile Layer 2", tileset2);
     const groundLayer3 = map2.createLayer("Tile Layer 3", tileset2);
+    groundLayer2.setPipeline("Light2D");
+    groundLayer3.setPipeline("Light2D");
+
+    // groundLayer2?.setCollisionByExclusion([-1], true);
+    // groundLayer3?.setCollisionByExclusion([-1], true);
+    // groundLayer2?.tilemap.forEachTile((tile) => {
+    //   if (tile.properties.collidesTop) {
+    //     tile.setCollision(false, false, true, false);
+    //   }
+    // });
+    // groundLayer3?.tilemap.forEachTile((tile) => {
+    //   if (tile.properties.collidesTop) {
+    //     tile.setCollision(false, false, true, false);
+    //   }
+    // });
 
     // const map2 = this.make.tilemap({ key: "brick2" });
     // const tileset2 = map2.addTilesetImage(
@@ -196,8 +219,14 @@ class Game extends Phaser.Scene {
       setScale: { x: 0.8, y: 0.8 },
       dragX: 400,
       dragY: 100,
+      bounceY: 0.7,
       createCallback: (go) => {
+        go.alpha = 0.2;
+        setTimeout(() => {
+          go.alpha = 1;
+        }, 500);
         const angle = Math.random() * 7 * Math.PI * 2;
+
         go.setVelocityX(Math.sin(angle) * 500);
         go.setVelocityY(Math.cos(angle) * 500);
       },
@@ -208,14 +237,6 @@ class Game extends Phaser.Scene {
         Phaser.Math.FloatBetween(0.4, 0.9)
       );
     }
-
-    this.boy = this.add.spineContainer(
-      this.level === 1 ? 190 : 2317,
-      this.level === 1 ? 2100 : 240,
-      "shadow",
-      "idle",
-      true
-    );
 
     // this.tweens.add({
     //   targets: this.boy,
@@ -281,6 +302,8 @@ class Game extends Phaser.Scene {
         });
       }
     });
+
+    // this.cameras.main.postFX.addTiltShift(0.9, 2.0, 0.4);
     // const lizard = this.physics.add.sprite(256, 500, "lizard").setScale(3.5);
     const lizards = this.physics.add.group({
       classType: Lizard,
@@ -350,7 +373,7 @@ class Game extends Phaser.Scene {
     // this.boy.spine.setColor(100, 'Kisty 2');
     this.cameras.main.startFollow(this.boy, false, 0.08, 0.09);
     // this.cameras.main.setFollowOffset(-300, 0);
-    this.cameras.main.setFollowOffset(-20, 80);
+    this.cameras.main.setFollowOffset(-30, 80);
     /** исправляет дрожание персонажа при передвижении (jitter bug) */
     this.physics.world.fixedStep = false;
   }
@@ -410,9 +433,24 @@ class Game extends Phaser.Scene {
     // });
   }
   collectStar(player, star?: Phaser.Types.Physics.Arcade.ImageWithDynamicBody) {
-    star!.disableBody(true, true);
-    this.scene.remove(star);
-    this.starsSummary += 5;
+    if (star?.alpha === 1) {
+      star!.disableBody(true, false);
+      this.starsSummary += 5;
+      this.tweens.add({
+        targets: star,
+        x: -5000,
+        y: -2000,
+        ease: "Bounce", // 'Cubic', 'Elastic', 'Bounce', 'Back'
+        duration: 3000,
+        repeat: 0, // -1: infinity
+        yoyo: false,
+      });
+
+      setTimeout(() => {
+        star!.disableBody(true, true);
+        this.scene.remove(star);
+      }, 2000);
+    }
   }
   punchStar(sword, star?: Phaser.Types.Physics.Arcade.ImageWithDynamicBody) {
     if (this.boy.spine.getData("attack")) {
@@ -431,7 +469,7 @@ class Game extends Phaser.Scene {
     lizards?: Phaser.Types.Physics.Arcade.ImageWithDynamicBody
   ) {
     if (this.boy.spine.getData("attack")) {
-      lizards?.takeDamage(4);
+      lizards?.takeDamage(90);
       if (this.boy.sgo.scaleX > 0) {
         lizards?.setVelocityX(800);
       } else {
@@ -454,7 +492,7 @@ const config: Phaser.Types.Core.GameConfig = {
   physics: {
     default: "arcade",
     arcade: {
-      gravity: { y: 800 },
+      gravity: { y: 2200 },
       // debug: true,
     },
   },
