@@ -318,11 +318,16 @@ class Game extends Phaser.Scene {
     // lizards.get(150, 200, "lizard");
     // lizards.get(150, 2500, "lizard");
     // lizards.get(300, 2500, "lizard");
-    lizards.create(300, 2500, "lizard");
-    lizards.create(400, 2500, "lizard");
+    lizards.create(600, 1500, "lizard");
+    lizards.create(700, 2000, "lizard");
+    lizards.create(300, 1000, "lizard");
+    lizards.create(500, 0, "lizard");
     lizards.create(600, 2500, "lizard");
     lizards.create(800, 2500, "lizard");
     lizards.create(900, 2500, "lizard");
+    lizards.create(2300, 2500, "lizard");
+    lizards.create(2100, 2500, "lizard");
+    lizards.create(2200, 1500, "lizard");
 
     this.physics.add.collider(this.boy, groundLayer2);
     this.physics.add.collider(this.boy, groundLayer3);
@@ -435,7 +440,6 @@ class Game extends Phaser.Scene {
   collectStar(player, star?: Phaser.Types.Physics.Arcade.ImageWithDynamicBody) {
     if (star?.alpha === 1) {
       star!.disableBody(true, false);
-      this.starsSummary += 5;
       this.tweens.add({
         targets: star,
         x: -5000,
@@ -445,6 +449,10 @@ class Game extends Phaser.Scene {
         repeat: 0, // -1: infinity
         yoyo: false,
       });
+
+      setTimeout(() => {
+        this.starsSummary += 5;
+      }, 500);
 
       setTimeout(() => {
         star!.disableBody(true, true);
